@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
 import com.gestion.tareas.dto.GlobalResponse;
 import com.gestion.tareas.dto.TareaRequestDTO;
 import com.gestion.tareas.dto.TareaResponseDTO;
@@ -13,7 +12,6 @@ import com.gestion.tareas.entity.EstadoTarea;
 import com.gestion.tareas.entity.PrioridadTarea;
 import com.gestion.tareas.entity.Tarea;
 import com.gestion.tareas.repository.TareaRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,9 +26,20 @@ public class TareaService {
         Tarea nuevaTarea = new Tarea();
         nuevaTarea.setTitulo(request.getTitulo());
         nuevaTarea.setDescripcion(request.getDescripcion());
-        
-        // Conversión segura de String a Enum mapeando la prioridad recibida
-        nuevaTarea.setPrioridad(PrioridadTarea.valueOf(request.getPrioridad().toUpperCase()));
+
+        if (request.getPrioridad().equals("BAJA")) {
+            nuevaTarea.setPrioridad(PrioridadTarea.BAJA);
+        }
+        if (request.getPrioridad().equals("MEDIA")) {
+            nuevaTarea.setPrioridad(PrioridadTarea.MEDIA);
+        }
+        if (request.getPrioridad().equals("ALTA")) {
+            nuevaTarea.setPrioridad(PrioridadTarea.ALTA);
+        }
+        if (request.getPrioridad().equals("URGENTE")) {
+            nuevaTarea.setPrioridad(PrioridadTarea.URGENTE);
+        }
+
         nuevaTarea.setEstado(EstadoTarea.PENDIENTE);
 
         Tarea tareaGuardada = tareaRepository.save(nuevaTarea);
@@ -47,8 +56,7 @@ public class TareaService {
     public GlobalResponse<List<TareaResponseDTO>> obtenerTodas() {
         GlobalResponse<List<TareaResponseDTO>> response = new GlobalResponse<>();
         List<TareaResponseDTO> listaDtos = new ArrayList<>();
-        
-        // Se utiliza el método personalizado para traer únicamente los registros activos
+
         List<Tarea> tareasEncontradas = tareaRepository.findByActivoTrue();
 
         for (Tarea tarea : tareasEncontradas) {
@@ -66,7 +74,7 @@ public class TareaService {
         GlobalResponse<TareaResponseDTO> response = new GlobalResponse<>();
         Optional<Tarea> tareaEncontrada = tareaRepository.findById(id);
 
-        if (tareaEncontrada.isEmpty() || !tareaEncontrada.get().getActivo()) {
+        if (tareaEncontrada.isEmpty()) {
             response.setSuccess(false);
             response.setMensaje("Tarea no encontrada");
             return response;
@@ -74,17 +82,29 @@ public class TareaService {
 
         Tarea tarea = tareaEncontrada.get();
 
+        if (tarea.getActivo() == false) {
+            response.setSuccess(false);
+            response.setMensaje("Tarea no encontrada");
+            return response;
+        }
+
         if (tarea.getEstado() == EstadoTarea.CANCELADA) {
             response.setSuccess(false);
             response.setMensaje("No se puede modificar una tarea CANCELADA");
             return response;
         }
 
-        if (tarea.getEstado() == EstadoTarea.COMPLETADA && 
-           (nuevoEstado == EstadoTarea.PENDIENTE || nuevoEstado == EstadoTarea.EN_PROGRESO)) {
-            response.setSuccess(false);
-            response.setMensaje("Una tarea COMPLETADA no puede retroceder de estado");
-            return response;
+        if (tarea.getEstado() == EstadoTarea.COMPLETADA) {
+            if (nuevoEstado == EstadoTarea.PENDIENTE) {
+                response.setSuccess(false);
+                response.setMensaje("Una tarea COMPLETADA no puede retroceder de estado");
+                return response;
+            }
+            if (nuevoEstado == EstadoTarea.EN_PROGRESO) {
+                response.setSuccess(false);
+                response.setMensaje("Una tarea COMPLETADA no puede retroceder de estado");
+                return response;
+            }
         }
 
         tarea.setEstado(nuevoEstado);
