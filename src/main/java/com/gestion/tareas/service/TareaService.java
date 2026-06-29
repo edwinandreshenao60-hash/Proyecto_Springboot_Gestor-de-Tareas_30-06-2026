@@ -117,6 +117,34 @@ public class TareaService {
         return response;
     }
 
+    public GlobalResponse<TareaResponseDTO> eliminarTarea(Long id) {
+        GlobalResponse<TareaResponseDTO> response = new GlobalResponse<>();
+        Optional<Tarea> tareaEncontrada = tareaRepository.findById(id);
+
+        if (tareaEncontrada.isEmpty()) {
+            response.setSuccess(false);
+            response.setMensaje("Tarea no encontrada");
+            return response;
+        }
+
+        Tarea tarea = tareaEncontrada.get();
+
+        if (tarea.getActivo() == false) {
+            response.setSuccess(false);
+            response.setMensaje("La tarea ya se encuentra eliminada");
+            return response;
+        }
+
+        tarea.setActivo(false);
+        tareaRepository.save(tarea);
+
+        response.setSuccess(true);
+        response.setMensaje("Tarea eliminada exitosamente");
+        response.setData(mapearADto(tarea));
+
+        return response;
+    }
+
     private TareaResponseDTO mapearADto(Tarea tarea) {
         TareaResponseDTO dto = new TareaResponseDTO();
         dto.setId(tarea.getId());

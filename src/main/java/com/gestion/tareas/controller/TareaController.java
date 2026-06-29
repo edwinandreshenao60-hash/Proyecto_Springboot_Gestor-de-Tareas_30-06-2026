@@ -3,6 +3,7 @@ package com.gestion.tareas.controller;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,6 +69,17 @@ public class TareaController {
         }
 
         GlobalResponse<TareaResponseDTO> response = tareaService.cambiarEstado(id, nuevoEstado);
+
+        if (response.isSuccess() == true) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<GlobalResponse<TareaResponseDTO>> eliminarTarea(@PathVariable Long id) {
+        GlobalResponse<TareaResponseDTO> response = tareaService.eliminarTarea(id);
 
         if (response.isSuccess() == true) {
             return new ResponseEntity<>(response, HttpStatus.OK);
