@@ -1,6 +1,6 @@
 {
 	"info": {
-		"name": "Gestor de Tareas API - Suite Completa",
+		"name": "Gestor de Tareas API - Pruebas de Endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -37,7 +37,7 @@
 			}
 		},
 		{
-			"name": "5. PATCH - Error Lógica (Retroceder Completada)",
+			"name": "5. PATCH - Error Lógica (Retroceder Estado)",
 			"request": {
 				"method": "PATCH",
 				"url": { "raw": "http://localhost:8080/api/tareas/1/estado?estado=PENDIENTE", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "1", "estado"], "query": [{"key": "estado", "value": "PENDIENTE"}] }
