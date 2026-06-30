@@ -3,7 +3,7 @@ package com.gestion.tareas.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.gestion.tareas.dto.GlobalResponse;
 import com.gestion.tareas.dto.TareaRequestDTO;
@@ -22,66 +22,135 @@ public class TareaService {
 
     public GlobalResponse<TareaResponseDTO> crearTarea(TareaRequestDTO request) {
         GlobalResponse<TareaResponseDTO> response = new GlobalResponse<>();
-
         Tarea nuevaTarea = new Tarea();
         nuevaTarea.setTitulo(request.getTitulo());
         nuevaTarea.setDescripcion(request.getDescripcion());
 
-        if (request.getPrioridad().equals("BAJA")) {
+        String prioridad = request.getPrioridad();
+        if (prioridad.equals("BAJA")) {
             nuevaTarea.setPrioridad(PrioridadTarea.BAJA);
         }
-        if (request.getPrioridad().equals("MEDIA")) {
+        if (prioridad.equals("MEDIA")) {
             nuevaTarea.setPrioridad(PrioridadTarea.MEDIA);
         }
-        if (request.getPrioridad().equals("ALTA")) {
+        if (prioridad.equals("ALTA")) {
             nuevaTarea.setPrioridad(PrioridadTarea.ALTA);
         }
-        if (request.getPrioridad().equals("URGENTE")) {
+        if (prioridad.equals("URGENTE")) {
             nuevaTarea.setPrioridad(PrioridadTarea.URGENTE);
         }
 
         nuevaTarea.setEstado(EstadoTarea.PENDIENTE);
-
         Tarea tareaGuardada = tareaRepository.save(nuevaTarea);
-
-        TareaResponseDTO dto = mapearADto(tareaGuardada);
-
+        
         response.setSuccess(true);
         response.setMensaje("Tarea creada exitosamente");
-        response.setData(dto);
-
+        response.setData(mapearADto(tareaGuardada));
         return response;
     }
 
     public GlobalResponse<List<TareaResponseDTO>> obtenerTodas() {
+        return obtenerTodas(null);
+    }
+
+    public GlobalResponse<List<TareaResponseDTO>> obtenerTodas(String ordenarPor) {
         GlobalResponse<List<TareaResponseDTO>> response = new GlobalResponse<>();
         List<TareaResponseDTO> listaDtos = new ArrayList<>();
-
-        List<Tarea> tareasEncontradas = tareaRepository.findByActivoTrue();
+        
+        String criterio = "fechaCreacion";
+        if (ordenarPor != null) {
+            if (ordenarPor.trim().isEmpty() == false) {
+                criterio = ordenarPor;
+            }
+        }
+        
+        List<Tarea> tareasEncontradas = tareaRepository.findByActivoTrue(Sort.by(Sort.Direction.ASC, criterio));
 
         for (Tarea tarea : tareasEncontradas) {
             listaDtos.add(mapearADto(tarea));
         }
 
         response.setSuccess(true);
-        response.setMensaje("Tareas obtenidas correctamente");
+        response.setMensaje("Tareas obtuvo correctamente");
         response.setData(listaDtos);
-
         return response;
     }
 
-    public GlobalResponse<TareaResponseDTO> cambiarEstado(Long id, EstadoTarea nuevoEstado) {
+    public GlobalResponse<TareaResponseDTO> obtenerPorId(Long id) {
         GlobalResponse<TareaResponseDTO> response = new GlobalResponse<>();
-        Optional<Tarea> tareaEncontrada = tareaRepository.findById(id);
+        Optional<Tarea> optional = tareaRepository.findById(id);
 
-        if (tareaEncontrada.isEmpty()) {
+        if (optional.isPresent() == false) {
             response.setSuccess(false);
             response.setMensaje("Tarea no encontrada");
             return response;
         }
 
-        Tarea tarea = tareaEncontrada.get();
+        Tarea tarea = optional.get();
+        if (tarea.getActivo() == false) {
+            response.setSuccess(false);
+            response.setMensaje("Tarea no encontrada");
+            return response;
+        }
 
+        response.setSuccess(true);
+        response.setMensaje("Tarea obtuvo correctamente");
+        response.setData(mapearADto(tarea));
+        return response;
+    }
+
+    public GlobalResponse<TareaResponseDTO> actualizarTarea(Long id, TareaRequestDTO request) {
+        GlobalResponse<TareaResponseDTO> response = new GlobalResponse<>();
+        Optional<Tarea> optional = tareaRepository.findById(id);
+
+        if (optional.isPresent() == false) {
+            response.setSuccess(false);
+            response.setMensaje("Tarea no encontrada");
+            return response;
+        }
+
+        Tarea tarea = optional.get();
+        if (tarea.getActivo() == false) {
+            response.setSuccess(false);
+            response.setMensaje("Tarea no encontrada");
+            return response;
+        }
+
+        tarea.setTitulo(request.getTitulo());
+        tarea.setDescripcion(request.getDescripcion());
+
+        String prioridad = request.getPrioridad();
+        if (prioridad.equals("BAJA")) {
+            tarea.setPrioridad(PrioridadTarea.BAJA);
+        }
+        if (prioridad.equals("MEDIA")) {
+            tarea.setPrioridad(PrioridadTarea.MEDIA);
+        }
+        if (prioridad.equals("ALTA")) {
+            tarea.setPrioridad(PrioridadTarea.ALTA);
+        }
+        if (prioridad.equals("URGENTE")) {
+            tarea.setPrioridad(PrioridadTarea.URGENTE);
+        }
+
+        Tarea tareaActualizada = tareaRepository.save(tarea);
+        response.setSuccess(true);
+        response.setMensaje("Tarea actualizada exitosamente");
+        response.setData(mapearADto(tareaActualizada));
+        return response;
+    }
+
+    public GlobalResponse<TareaResponseDTO> cambiarEstado(Long id, EstadoTarea nuevoEstado) {
+        GlobalResponse<TareaResponseDTO> response = new GlobalResponse<>();
+        Optional<Tarea> optional = tareaRepository.findById(id);
+
+        if (optional.isPresent() == false) {
+            response.setSuccess(false);
+            response.setMensaje("Tarea no encontrada");
+            return response;
+        }
+
+        Tarea tarea = optional.get();
         if (tarea.getActivo() == false) {
             response.setSuccess(false);
             response.setMensaje("Tarea no encontrada");
@@ -113,22 +182,20 @@ public class TareaService {
         response.setSuccess(true);
         response.setMensaje("Estado actualizado exitosamente");
         response.setData(mapearADto(tarea));
-
         return response;
     }
 
     public GlobalResponse<TareaResponseDTO> eliminarTarea(Long id) {
         GlobalResponse<TareaResponseDTO> response = new GlobalResponse<>();
-        Optional<Tarea> tareaEncontrada = tareaRepository.findById(id);
+        Optional<Tarea> optional = tareaRepository.findById(id);
 
-        if (tareaEncontrada.isEmpty()) {
+        if (optional.isPresent() == false) {
             response.setSuccess(false);
             response.setMensaje("Tarea no encontrada");
             return response;
         }
 
-        Tarea tarea = tareaEncontrada.get();
-
+        Tarea tarea = optional.get();
         if (tarea.getActivo() == false) {
             response.setSuccess(false);
             response.setMensaje("La tarea ya se encuentra eliminada");
@@ -141,7 +208,79 @@ public class TareaService {
         response.setSuccess(true);
         response.setMensaje("Tarea eliminada exitosamente");
         response.setData(mapearADto(tarea));
+        return response;
+    }
 
+    public GlobalResponse<List<TareaResponseDTO>> filtrarPorEstado(String estado) {
+        GlobalResponse<List<TareaResponseDTO>> response = new GlobalResponse<>();
+        List<TareaResponseDTO> listaDtos = new ArrayList<>();
+        
+        EstadoTarea estadoEnum = EstadoTarea.PENDIENTE;
+        if (estado.equals("PENDIENTE")) {
+            estadoEnum = EstadoTarea.PENDIENTE;
+        }
+        if (estado.equals("EN_PROGRESO")) {
+            estadoEnum = EstadoTarea.EN_PROGRESO;
+        }
+        if (estado.equals("COMPLETADA")) {
+            estadoEnum = EstadoTarea.COMPLETADA;
+        }
+        if (estado.equals("CANCELADA")) {
+            estadoEnum = EstadoTarea.CANCELADA;
+        }
+
+        List<Tarea> tareas = tareaRepository.findByEstadoAndActivoTrue(estadoEnum);
+        for (Tarea tarea : tareas) {
+            listaDtos.add(mapearADto(tarea));
+        }
+
+        response.setSuccess(true);
+        response.setMensaje("Tareas filtradas por estado correctamente");
+        response.setData(listaDtos);
+        return response;
+    }
+
+    public GlobalResponse<List<TareaResponseDTO>> filtrarPorPrioridad(String prioridad) {
+        GlobalResponse<List<TareaResponseDTO>> response = new GlobalResponse<>();
+        List<TareaResponseDTO> listaDtos = new ArrayList<>();
+        
+        PrioridadTarea prioridadEnum = PrioridadTarea.BAJA;
+        if (prioridad.equals("BAJA")) {
+            prioridadEnum = PrioridadTarea.BAJA;
+        }
+        if (prioridad.equals("MEDIA")) {
+            prioridadEnum = PrioridadTarea.MEDIA;
+        }
+        if (prioridad.equals("ALTA")) {
+            prioridadEnum = PrioridadTarea.ALTA;
+        }
+        if (prioridad.equals("URGENTE")) {
+            prioridadEnum = PrioridadTarea.URGENTE;
+        }
+
+        List<Tarea> tareas = tareaRepository.findByPrioridadAndActivoTrue(prioridadEnum);
+        for (Tarea tarea : tareas) {
+            listaDtos.add(mapearADto(tarea));
+        }
+
+        response.setSuccess(true);
+        response.setMensaje("Tareas filtradas por prioridad correctamente");
+        response.setData(listaDtos);
+        return response;
+    }
+
+    public GlobalResponse<List<TareaResponseDTO>> buscarPorTitulo(String q) {
+        GlobalResponse<List<TareaResponseDTO>> response = new GlobalResponse<>();
+        List<TareaResponseDTO> listaDtos = new ArrayList<>();
+        List<Tarea> tareas = tareaRepository.findByTituloContainingIgnoreCaseAndActivoTrue(q);
+
+        for (Tarea tarea : tareas) {
+            listaDtos.add(mapearADto(tarea));
+        }
+
+        response.setSuccess(true);
+        response.setMensaje("Tareas encontradas correctamente");
+        response.setData(listaDtos);
         return response;
     }
 
