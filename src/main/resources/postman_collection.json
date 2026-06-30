@@ -1,0 +1,61 @@
+{
+	"info": {
+		"name": "Gestor de Tareas API - Suite Completa",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. POST - Crear Tarea OK",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": { "mode": "raw", "raw": "{\"titulo\": \"Estudiar\", \"descripcion\": \"Repasar Spring\", \"prioridad\": \"ALTA\"}", "options": { "raw": { "language": "json" } } },
+				"url": { "raw": "http://localhost:8080/api/tareas", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas"] }
+			}
+		},
+		{
+			"name": "2. POST - Crear Tarea Error (Validacion)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": { "mode": "raw", "raw": "{\"titulo\": \"\", \"descripcion\": \"\", \"prioridad\": \"BAJA\"}", "options": { "raw": { "language": "json" } } },
+				"url": { "raw": "http://localhost:8080/api/tareas", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas"] }
+			}
+		},
+		{
+			"name": "3. GET - Listar Tareas",
+			"request": {
+				"method": "GET",
+				"url": { "raw": "http://localhost:8080/api/tareas", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas"] }
+			}
+		},
+		{
+			"name": "4. PATCH - Cambiar Estado OK",
+			"request": {
+				"method": "PATCH",
+				"url": { "raw": "http://localhost:8080/api/tareas/1/estado?estado=EN_PROGRESO", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "1", "estado"], "query": [{"key": "estado", "value": "EN_PROGRESO"}] }
+			}
+		},
+		{
+			"name": "5. PATCH - Error Lógica (Retroceder Completada)",
+			"request": {
+				"method": "PATCH",
+				"url": { "raw": "http://localhost:8080/api/tareas/1/estado?estado=PENDIENTE", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "1", "estado"], "query": [{"key": "estado", "value": "PENDIENTE"}] }
+			}
+		},
+		{
+			"name": "6. DELETE - Eliminar OK",
+			"request": {
+				"method": "DELETE",
+				"url": { "raw": "http://localhost:8080/api/tareas/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "1"] }
+			}
+		},
+		{
+			"name": "7. DELETE - Error ID No Encontrado",
+			"request": {
+				"method": "DELETE",
+				"url": { "raw": "http://localhost:8080/api/tareas/999", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "999"] }
+			}
+		}
+	]
+}
