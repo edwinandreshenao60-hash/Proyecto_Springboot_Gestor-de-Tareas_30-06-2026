@@ -23,6 +23,26 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(respuesta, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<GlobalResponse<Object>> manejarResourceNotFound(ResourceNotFoundException ex) {
+        GlobalResponse<Object> respuesta = new GlobalResponse<>();
+        respuesta.setSuccess(false);
+        respuesta.setMensaje(ex.getMessage());
+        respuesta.setData(null);
+        
+        return new ResponseEntity<>(respuesta, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ResponseEntity<GlobalResponse<Object>> manejarInvalidStatusTransition(InvalidStatusTransitionException ex) {
+        GlobalResponse<Object> respuesta = new GlobalResponse<>();
+        respuesta.setSuccess(false);
+        respuesta.setMensaje(ex.getMessage());
+        respuesta.setData(null);
+        
+        return new ResponseEntity<>(respuesta, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GlobalResponse<Object>> manejarErroresGenerales(Exception ex) {
         GlobalResponse<Object> respuesta = new GlobalResponse<>();
