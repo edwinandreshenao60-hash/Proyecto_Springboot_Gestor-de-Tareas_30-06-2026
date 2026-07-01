@@ -9,52 +9,244 @@
 			"request": {
 				"method": "POST",
 				"header": [],
-				"body": { "mode": "raw", "raw": "{\"titulo\": \"Estudiar\", \"descripcion\": \"Repasar Spring\", \"prioridad\": \"ALTA\"}", "options": { "raw": { "language": "json" } } },
-				"url": { "raw": "http://localhost:8080/api/tareas", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas"] }
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"titulo\": \"Aprender Arquitectura Clean\",\n    \"descripcion\": \"Diseñar APIs estructuradas en Spring Boot\",\n    \"prioridad\": \"ALTA\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tareas",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas"]
+				}
 			}
 		},
 		{
-			"name": "2. POST - Crear Tarea Error (Validacion)",
+			"name": "2. POST - Crear Tarea con Error (Validación)",
 			"request": {
 				"method": "POST",
 				"header": [],
-				"body": { "mode": "raw", "raw": "{\"titulo\": \"\", \"descripcion\": \"\", \"prioridad\": \"BAJA\"}", "options": { "raw": { "language": "json" } } },
-				"url": { "raw": "http://localhost:8080/api/tareas", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas"] }
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"titulo\": \"\",\n    \"descripcion\": \"Intento fallido\",\n    \"prioridad\": \"BAJA\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tareas",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas"]
+				}
 			}
 		},
 		{
-			"name": "3. GET - Listar Tareas",
+			"name": "3. GET - Listar Tareas General",
 			"request": {
 				"method": "GET",
-				"url": { "raw": "http://localhost:8080/api/tareas", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas"] }
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas"]
+				}
 			}
 		},
 		{
-			"name": "4. PATCH - Cambiar Estado OK",
+			"name": "4. GET - Listar Tareas Ordenadas por Titulo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas?ordenarPor=titulo",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas"],
+					"query": [
+						{
+							"key": "ordenarPor",
+							"value": "titulo"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "5. GET - Obtener por ID OK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "1"]
+				}
+			}
+		},
+		{
+			"name": "6. GET - Obtener por ID Error (404 Not Found)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/999",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "999"]
+				}
+			}
+		},
+		{
+			"name": "7. PUT - Actualizar Tarea Completa OK",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"titulo\": \"Aprender Arquitectura Avanzada\",\n    \"descripcion\": \"Modificando descripcion original\",\n    \"prioridad\": \"URGENTE\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "1"]
+				}
+			}
+		},
+		{
+			"name": "8. PATCH - Cambiar Estado OK",
 			"request": {
 				"method": "PATCH",
-				"url": { "raw": "http://localhost:8080/api/tareas/1/estado?estado=EN_PROGRESO", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "1", "estado"], "query": [{"key": "estado", "value": "EN_PROGRESO"}] }
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1/estado?nuevoEstado=EN_PROGRESO",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "1", "estado"],
+					"query": [
+						{
+							"key": "nuevoEstado",
+							"value": "EN_PROGRESO"
+						}
+					]
+				}
 			}
 		},
 		{
-			"name": "5. PATCH - Error Lógica (Retroceder Estado)",
+			"name": "9. PATCH - Error 409 Error al Cambiar Estado (Estado Invalido)",
 			"request": {
 				"method": "PATCH",
-				"url": { "raw": "http://localhost:8080/api/tareas/1/estado?estado=PENDIENTE", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "1", "estado"], "query": [{"key": "estado", "value": "PENDIENTE"}] }
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1/estado?nuevoEstado=PENDIENTE",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "1", "estado"],
+					"query": [
+						{
+							"key": "nuevoEstado",
+							"value": "PENDIENTE"
+						}
+					]
+				}
 			}
 		},
 		{
-			"name": "6. DELETE - Eliminar OK",
+			"name": "10. GET - Filtrar por Estado",
 			"request": {
-				"method": "DELETE",
-				"url": { "raw": "http://localhost:8080/api/tareas/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "1"] }
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/filtrar-estado?estado=EN_PROGRESO",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "filtrar-estado"],
+					"query": [
+						{
+							"key": "estado",
+							"value": "EN_PROGRESO"
+						}
+					]
+				}
 			}
 		},
 		{
-			"name": "7. DELETE - Error ID No Encontrado",
+			"name": "11. GET - Filtrar por Prioridad",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/filtrar-prioridad?prioridad=URGENTE",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "filtrar-prioridad"],
+					"query": [
+						{
+							"key": "prioridad",
+							"value": "URGENTE"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "12. GET - Buscar por Titulo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/buscar?q=Arquitectura",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "buscar"],
+					"query": [
+						{
+							"key": "q",
+							"value": "Arquitectura"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "13. DELETE - Eliminar Tarea OK",
 			"request": {
 				"method": "DELETE",
-				"url": { "raw": "http://localhost:8080/api/tareas/999", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "tareas", "999"] }
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "tareas", "1"]
+				}
 			}
 		}
 	]
